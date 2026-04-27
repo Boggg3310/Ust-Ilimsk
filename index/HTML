@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Индивидуальный проект — Усть-Илимск в 3D | Blender</title>
+    <style>
+        :root {
+            --warm-cream: #fdf6ed;
+            --soft-beige: #f5e6d3;
+            --dusty-rose: #d4a89c;
+            --warm-brown: #8b6f5e;
+            --deep-brown: #5c3d2e;
+            --muted-sage: #a8b5a0;
+            --soft-terracotta: #c67b5c;
+            --dark-charcoal: #3a3335;
+            --golden-light: #e8cfa0;
+            --paper-white: #fefaf3;
+            --accent-warm: #b87351;
+            --text-primary: #3a3335;
+            --text-secondary: #6b5e5a;
+            --card-bg: #fefaf5;
+            --shadow-soft: 0 4px 20px rgba(92, 61, 46, 0.10);
+            --shadow-medium: 0 8px 32px rgba(92, 61, 46, 0.14);
+            --border-soft: 1px solid #e8d9cc;
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 22px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-heading: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+            --font-body: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--warm-cream);
+            color: var(--text-primary);
+            line-height: 1.7;
+            letter-spacing: 0.01em;
+            background-image:
+                radial-gradient(ellipse at 15% 10%, rgba(212, 168, 156, 0.12) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 90%, rgba(168, 181, 160, 0.10) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(232, 207, 160, 0.08) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        /* ─── Navigation ──────────── */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(253, 246, 237, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(200, 180, 165, 0.35);
+            padding: 0.7rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .navbar .logo {
+            font-family: var(--font-heading);
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--deep-brown);
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+        .navbar .logo span {
+            color: var(--soft-terracotta);
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.4rem;
+            list-style: none;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.92rem;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.2rem 0;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--soft-terracotta);
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+        .nav-links a:hover {
+            color: var(--deep-brown);
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .nav-links .btn-nav {
+            background: var(--soft-terracotta);
+            color: #fff;
+            padding: 0.45rem 1.2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            transition: var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .nav-links .btn-nav:hover {
+            background: var(--deep-brown);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+        }
+        .nav-links .btn-nav::after {
+            display: none;
+        }
+
+        /* ─── Hero Section ────────── */
+        .hero {
+            text-align: center;
+            padding: 4.5rem 2rem 3.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: -80px;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(212, 168, 156, 0.22) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            right: -60px;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(168, 181, 160, 0.20) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: var(--soft-beige);
+            color: var(--deep-brown);
+            padding: 0.4rem 1.3rem;
+            border-radius: 25px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin-bottom: 1.4rem;
+            border: 1px solid #e0cfbc;
+        }
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.2rem, 5vw, 3.4rem);
+            color: var(--deep-brown);
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+        }
+        .hero h1 .highlight {
+            color: var(--soft-terracotta);
+            position: relative;
+        }
+        .hero .subtitle {
+            font-size: 1.18rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 1.8rem;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero .city-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--card-bg);
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            color: var(--warm-brown);
+            border: var(--border-soft);
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-soft);
+        }
+        .hero .city-tag .pin {
+            font-size: 1.3rem;
+        }
+
+        /* ─── Image Placeholder ───── */
+        .image-placeholder {
+            width: 100%;
+            max-width: 750px;
+            margin: 2rem auto;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #e8d5c4 0%, #d4bfa8 25%, #c9b89a 50%, #bda588 75%, #d9c7b0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .image-placeholder .overlay-text {
+            position: absolute;
+            bottom: 20px;
+            left: 24px;
+            background: rgba(60, 40, 30, 0.7);
+            color: #fdf6ed;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            backdrop-filter: blur(6px);
+        }
+
+        /* ─── Sections ────────────── */
+        .section {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+        }
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--deep-brown);
+            margin-bottom: 1.3rem;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 55px;
+            height: 3px;
+            background: var(--soft-terracotta);
+            border-radius: 3px;
+        }
+        .section p {
+            margin-bottom: 1.2rem;
+            color: var(--text-primary);
+            font-size: 1.02rem;
+        }
+
+        /* ─── Cards ───────────────── */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 1.6rem 1.5rem;
+            border: var(--border-soft);
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+            border-color: #dcc9b5;
+        }
+        .card .card-icon {
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+        .card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            color: var(--deep-brown);
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            font-size: 0.94rem;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+        .card.accent-card {
+            border-left: 4px solid var(--soft-terracotta);
+        }
+
+        /* ─── Quote Block ─────────── */
+        .quote-block {
+            background: linear-gradient(135deg, #fdf3e8 0%, #fefaf5 100%);
+            border-radius: var(--radius-lg);
+            padding: 2rem 2.2rem;
+            margin: 2rem 0;
+            border: var(--border-soft);
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            font-style: italic;
+            color: var(--deep-brown);
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .quote-block::before {
+            content: '❝';
+            font-size: 4rem;
+            color: var(--dusty-rose);
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            opacity: 0.5;
+            font-style: normal;
+            line-height: 1;
+        }
+        .quote-block .author {
+            display: block;
+            margin-top: 1rem;
+            font-style: normal;
+            font-weight: 600;
+            color: var(--warm-brown);
+            font-size: 0.95rem;
+        }
+
+        /* ─── Timeline ────────────── */
+        .timeline {
+            list-style: none;
+            padding-left: 0;
+            margin: 1.5rem 0;
+            border-left: 3px solid #e0cfbc;
+            padding-left: 1.8rem;
+        }
+        .timeline li {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding-left: 1.2rem;
+            color: var(--text-primary);
+            font-size: 0.98rem;
+        }
+        .timeline li::before {
+            content: '';
+            position: absolute;
+            left: -2.45rem;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            background: var(--soft-terracotta);
+            border-radius: 50%;
+            border: 3px solid #fdf6ed;
+            box-shadow: 0 0 0 3px #e0cfbc;
+        }
+        .timeline li strong {
+            color: var(--deep-brown);
+        }
+
+        /* ─── Skills List ─────────── */
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 1rem 0;
+            list-style: none;
+            padding: 0;
+        }
+        .skills-list li {
+            background: var(--soft-beige);
+            color: var(--deep-brown);
+            padding: 0.45rem 1.1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid #e0cfbc;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .skills-list li:hover {
+            background: #e8d5c4;
+            border-color: #c9b09a;
+        }
+
+        /* ─── Links Block ─────────── */
+        .links-block {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        .link-card {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            background: var(--card-bg);
+            border: var(--border-soft);
+            border-radius: 30px;
+            padding: 0.7rem 1.4rem;
+            text-decoration: none;
+            color: var(--deep-brown);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow-soft);
+        }
+        .link-card:hover {
+            background: #fff;
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+            color: var(--soft-terracotta);
+        }
+        .link-card .link-icon {
+            font-size: 1.5rem;
+        }
+
+        /* ─── Footer ──────────────── */
+        .footer {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            border-top: 1px solid #e8d9cc;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            background: rgba(253, 246, 237, 0.5);
+        }
+        .footer strong {
+            color: var(--deep-brown);
+        }
+        .footer .links-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.8rem;
+        }
+        .footer .links-row a {
+            color: var(--warm-brown);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 1px dotted transparent;
+        }
+        .footer .links-row a:hover {
+            color: var(--soft-terracotta);
+            border-bottom-color: var(--soft-terracotta);
+        }
+
+        /* ─── Responsive ──────────── */
+        @media (max-width: 640px) {
+            .navbar {
+                padding: 0.6rem 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav-links {
+                gap: 0.7rem;
+            }
+            .hero {
+                padding: 2.5rem 1rem;
+            }
+            .section {
+                padding: 1.5rem 1rem;
+            }
+            .section-title {
+                font-size: 1.6rem;
+            }
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            .image-placeholder {
+                aspect-ratio: 4 / 3;
+            }
+            .quote-block {
+                padding: 1.5rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .section {
+                max-width: 880px;
+            }
+        }
+    </style>
+    <!-- Google Fonts for elegant typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ═══════════════ NAVBAR ═══════════════ -->
+    <nav class="navbar">
+        <div class="logo">🏙️ <span>Усть-Илимск</span> · 3D Проект</div>
+        <ul class="nav-links">
+            <li><a href="#about">О проекте</a></li>
+            <li><a href="#process">Процесс</a></li>
+            <li><a href="#emotions">Эмоции</a></li>
+            <li><a href="#links">Ссылки</a></li>
+            <li><a href="https://jsitor.com/" target="_blank" rel="noopener" class="btn-nav">JSitor ↗</a></li>
+        </ul>
+    </nav>
+
+    <!-- ═══════════════ HERO ═══════════════ -->
+    <header class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">📋 Индивидуальный проект</span>
+            <h1>Цифровая память<br><span class="highlight">Усть-Илимска</span></h1>
+            <p class="subtitle">
+                Создание трёхмерной модели фрагмента городской среды родного города в программе Blender — личная история, застывшая в цифре.
+            </p>
+            <div class="city-tag">
+                <span class="pin">📍</span> Усть-Илимск — город, который я помню и люблю
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════ HERO IMAGE ═══════════════ -->
+    <div class="image-placeholder">
+        <!-- Используем реалистичное изображение сибирского города/Усть-Илимска -->
+        <img src="https://images.unsplash.com/photo-1508873696983-2dfd5898f08b?w=1200&h=675&fit=crop&crop=center"
+        alt="Панорама Усть-Илимска — сибирский город"
+        loading="eager"
+        onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #c9b89a 0%, #bda588 30%, #a89070 60%, #d4bfa8 100%)'; this.parentElement.querySelector('.overlay-text').textContent='🏙️ Усть-Илимск — вид на город';">
+        <span class="overlay-text">🏙️ Усть-Илимск — сибирский город на Ангаре</span>
+    </div>
+
+    <!-- ═══════════════ SECTION: ABOUT ═══════════════ -->
+    <section class="section" id="about">
+        <h2 class="section-title">О чём этот проект</h2>
+        <p>
+            <strong>Тема моего проекта</strong> — создание трёхмерной модели фрагмента городской среды <strong>Усть-Илимска</strong> в программе <strong>Blender</strong>. На первый взгляд может показаться, что это просто учебная работа по 3D-моделированию. Однако я хочу показать, почему эта тема является важной и своевременной сразу по нескольким причинам.
+        </p>
+
+        <div class="cards-grid">
+            <div class="card accent-card">
+                <span class="card-icon">💾</span>
+                <h3>Сохранение памяти</h3>
+                <p>Цифровая копия городской среды — это «цифровой архив» повседневности, который фиксирует личную историю человека и его индивидуальный маршрут.</p>
+            </div>
+            <div class="card accent-card">
+                <span class="card-icon">🛠️</span>
+                <h3>Развитие навыков</h3>
+                <p>Освоение Blender на практике: моделирование, текстурирование, работа с освещением — и важные soft skills: планирование, усидчивость, внимание к деталям.</p>
+            </div>
+            <div class="card accent-card">
+                <span class="card-icon">🌟</span>
+                <h3>Популяризация города</h3>
+                <p>Усть-Илимск редко попадает в фокус медиа-внимания. Качественный визуальный контент может повысить интерес к городу со стороны туристов и инвесторов.</p>
+            </div>
+            <div class="card accent-card">
+                <span class="card-icon">🌍</span>
+                <h3>Доступность</h3>
+                <p>Blender — бесплатный профессиональный пакет с открытым исходным кодом. Достаточно желания, усидчивости и любви к родным местам.</p>
+            </div>
+        </div>
+
+        <div class="quote-block">
+            Это проект не для галочки. Это проект для души. Я хочу, чтобы через много лет я мог открыть этот файл и увидеть то, что было мне дорого в юности.
+            <span class="author">— Автор проекта</span>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SECTION: WHY UST-ILIMSK ═══════════════ -->
+    <section class="section">
+        <h2 class="section-title">Почему именно Усть-Илимск?</h2>
+        <p>
+            Усть-Илимск — это мой родной город. Я здесь родился, ходил в школу, гулял во дворах, занимался в секциях. И когда я задумался о проекте, я понял, что хочу сделать что-то очень личное.
+        </p>
+        <p>
+            Можно было бы моделировать знаменитые достопримечательности мира — Эйфелеву башню или Колизей. Но это было бы просто копирование того, что уже сделано тысячу раз. А мой город, мои улицы, мои дома — их в интернете нет. Их знаю только я и те, кто здесь живёт. И мне захотелось, чтобы у меня в компьютере осталась <strong>цифровая память</strong> об этих местах.
+        </p>
+
+        <!-- Вторая картинка -->
+        <div class="image-placeholder" style="max-width:650px; aspect-ratio: 3/2;">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&h=600&fit=crop&crop=center"
+            alt="Жилые дома Усть-Илимска"
+            loading="lazy"
+            onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #d9c7b0 0%, #c9b89a 50%, #bda588 100%)'; this.parentElement.querySelector('.overlay-text').textContent='🏠 Знакомые дворы Усть-Илимска';">
+            <span class="overlay-text">🏠 Знакомые дворы — личная карта воспоминаний</span>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SECTION: PROCESS ═══════════════ -->
+    <section class="section" id="process">
+        <h2 class="section-title">Процесс работы</h2>
+        <p>
+            Я начал с полного нуля — открывал Blender всего пару раз до этого. Интерфейс программы пугал: куча кнопок, вкладок, непонятные термины. Но я решил: <em>не попробую — не узнаю</em>.
+        </p>
+
+        <h3 style="color: var(--deep-brown); margin-top: 1.5rem; font-family: var(--font-heading);">Мой путь в Blender — по шагам:</h3>
+        <ul class="timeline">
+            <li><strong>Шаг 1:</strong> Посмотрел базовые уроки на YouTube, научился перемещать объекты, менять размер, вращать камеру. Первое достижение — просто красный кубик!</li>
+            <li><strong>Шаг 2:</strong> Разобрался с экструдированием, фасками и модификаторами. Перестал бояться нажимать не на те кнопки — Blender прощает ошибки.</li>
+            <li><strong>Шаг 3:</strong> Сбор референсов — фотографировал здания с разных ракурсов, искал старые снимки в семейных архивах и городских группах.</li>
+            <li><strong>Шаг 4:</strong> Организация времени — работаю по вечерам, час-два. Разбиваю работу на небольшие задачи, веду дневник прогресса.</li>
+            <li><strong>Шаг 5:</strong> Настройка сцены: свет, небо (HDRI-карты), лёгкий туман для глубины и атмосферы.</li>
+        </ul>
+
+        <h3 style="color: var(--deep-brown); margin-top: 1.5rem; font-family: var(--font-heading);">Трудности, с которыми я столкнулся:</h3>
+        <div class="cards-grid">
+            <div class="card">
+                <span class="card-icon">📏</span>
+                <h3>Масштаб</h3>
+                <p>В 3D легко ошибиться с размерами. Однажды дерево оказалось выше дома в два раза — пришлось всё переделывать.</p>
+            </div>
+            <div class="card">
+                <span class="card-icon">⏳</span>
+                <h3>Терпение</h3>
+                <p>Кропотливая работа. Когда час делал деталь, а потом понял, что неправильно — спасает только перерыв и чай.</p>
+            </div>
+            <div class="card">
+                <span class="card-icon">💻</span>
+                <h3>Железо</h3>
+                <p>Ноутбук не самый мощный. Научился отключать видимость объектов, над которыми не работаю, чтобы облегчить нагрузку.</p>
+            </div>
+            <div class="card">
+                <span class="card-icon">🎨</span>
+                <h3>Интуиция</h3>
+                <p>У меня нет художественного образования. Действую интуитивно: если цвет яркий — делаю бледнее, форма грубая — смягчаю.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SECTION: EMOTIONS ═══════════════ -->
+    <section class="section" id="emotions">
+        <h2 class="section-title">Эмоциональная сторона</h2>
+        <p>
+            Этот раздел, наверное, самый важный для меня. Потому что проект — это не только про кнопки и полигоны. <strong>Это про чувства.</strong>
+        </p>
+        <div class="quote-block">
+            Когда я сижу вечером перед экраном и воссоздаю знакомые очертания, я как будто возвращаюсь в прошлое. Я вспоминаю, как шёл по этой улице в школу, как встречался с друзьями у этого подъезда, как выглядывал в это окно. Это тёплое, немного грустное чувство ностальгии.
+            <span class="author">— Из дневника проекта</span>
+        </div>
+        <p>
+            Я понимаю, что город меняется. Что-то ремонтируют, что-то сносят, что-то строят новое. И я рад, что могу сохранить в цифре то, каким я его помню сейчас. Возможно, через много лет я открою этот проект и увижу Усть-Илимск таким, каким он был в моей юности. Для меня это способ <strong>сказать спасибо городу</strong>, в котором я вырос.
+        </p>
+        <p>
+            Я не стремлюсь к идеальной точности. Мои модели — это скорее <strong>образы, чем чертежи</strong>. Мне нравится, что в них есть немного наивности и неидеальности. Это делает их живыми. Как рисунок от руки, а не фотография.
+        </p>
+    </section>
+
+    <!-- ═══════════════ SECTION: SKILLS ═══════════════ -->
+    <section class="section">
+        <h2 class="section-title">Что дал мне проект</h2>
+        <p>За время работы я освоил Blender на базовом уровне и прокачал важные навыки:</p>
+        <ul class="skills-list">
+            <li>🧊 Создание и редактирование 3D-объектов</li>
+            <li>🎨 Работа с материалами и текстурами</li>
+            <li>💡 Настройка освещения и камер</li>
+            <li>📐 Организация сцены</li>
+            <li>🖼️ Финальный рендер</li>
+            <li>📋 Планирование времени</li>
+            <li>🧘 Усидчивость</li>
+            <li>🔍 Внимание к деталям</li>
+        </ul>
+        <p style="margin-top: 1.2rem;">
+            Эти навыки пригодятся мне в будущем, независимо от того, буду ли я продолжать заниматься 3D-графикой или нет. Я стал лучше понимать, как устроены трёхмерные сцены, как работает свет, как создаётся иллюзия реальности на плоском экране.
+        </p>
+    </section>
+
+    <!-- ═══════════════ SECTION: LINKS ═══════════════ -->
+    <section class="section" id="links" style="text-align: center;">
+        <h2 class="section-title" style="display: inline-block;">Полезные ссылки</h2>
+        <p style="margin-bottom: 0.5rem;">Здесь вы можете найти инструменты, которые я использовал, и мой профиль:</p>
+        <div class="links-block">
+            <a href="https://jsitor.com/" target="_blank" rel="noopener" class="link-card">
+                <span class="link-icon">🟢</span> JSitor — онлайн-редактор
+            </a>
+            <a href="https://github.com/Boggg3310" target="_blank" rel="noopener" class="link-card">
+                <span class="link-icon">🐙</span> GitHub — Boggg3310
+            </a>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 1rem;">
+            🔗 <strong>JSitor</strong> — удобный инструмент для быстрого тестирования кода.<br>
+            🔗 <strong>GitHub</strong> — мой профиль, где я храню проекты и наработки.
+        </p>
+    </section>
+
+    <!-- ═══════════════ FOOTER ═══════════════ -->
+    <footer class="footer">
+        <p>
+            <strong>Индивидуальный проект</strong> · Усть-Илимск в Blender · 2024–2025
+        </p>
+        <p style="margin-top: 0.3rem;">
+            Создано с любовью к родному городу и технологиям.
+        </p>
+        <div class="links-row">
+            <a href="https://jsitor.com/" target="_blank" rel="noopener">🌐 JSitor</a>
+            <a href="https://github.com/Boggg3310" target="_blank" rel="noopener">💻 GitHub: Boggg3310</a>
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.8rem; color: #a09085;">
+            Изображения предоставлены Unsplash. Все права на текстовые материалы принадлежат автору проекта.
+        </p>
+    </footer>
+
+</body>
+</html>
